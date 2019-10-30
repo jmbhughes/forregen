@@ -12,8 +12,11 @@ import org.lwjgl.opengl.GL30;
 
 public class Loader {
 	
+	// Keep the vaos and vbos to clean up when closing the program
 	private List<Integer> vaos = new ArrayList<Integer>();
 	private List<Integer> vbos = new ArrayList<Integer>();
+	
+	
 	public RawModel loadToVAO(float[] positions) {
 	 	int vaoID = createVAO();
 		storeDataInAttributeList(0, positions);
@@ -22,6 +25,9 @@ public class Loader {
 	}
 	
 	public void cleanUp() {
+		/**
+		 * Call at the end to clean up the created vaos and vbos
+		 */
 		for (int vao: vaos) {
 			GL30.glDeleteVertexArrays(vao);
 		}

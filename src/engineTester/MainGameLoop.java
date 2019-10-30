@@ -15,6 +15,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		Renderer renderer = new Renderer();
 		
+		// An example rectangle
 		float[] vertices = {
 				    -0.5f, 0.5f, 0f,
 				    -0.5f, -0.5f, 0f,
@@ -25,7 +26,6 @@ public class MainGameLoop {
 				  };
 		
 		RawModel model = loader.loadToVAO(vertices);
-		
 		 
 		while(!Display.isCloseRequested()) {
 			renderer.prepare();

@@ -19,6 +19,7 @@ public class DisplayManager {
 		attribs.withForwardCompatible(true);
 		attribs.withProfileCore(true);
 		
+		// Attempt to create a window
 		try {
 			Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
 			Display.create(new PixelFormat(), attribs);
@@ -26,6 +27,7 @@ public class DisplayManager {
 			e.printStackTrace();
 		}
 		
+		// Use the full window as the viewport
 		GL11.glViewport(0, 0, WIDTH, HEIGHT);
 	}
 	
