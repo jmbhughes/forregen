@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -15,6 +16,10 @@ import entities.Player;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.TexturedModel;
+import particles.Particle;
+import particles.ParticleMaster;
+import particles.ParticleSystem;
+import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -30,6 +35,8 @@ public class MainGameLoop {
 		
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
+		MasterRenderer renderer = new MasterRenderer(loader);
+		ParticleMaster.init(loader, renderer.getProjectionMatrix());
 		
 		// *********TERRAIN TEXTURE STUFF***********
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
@@ -129,7 +136,6 @@ public class MainGameLoop {
 
 		}
 
-		MasterRenderer renderer = new MasterRenderer(loader);
 
 	
 		TexturedModel avatar = new TexturedModel(OBJLoader.loadObjModel("player",  loader), new ModelTexture(loader.loadTexture("playerTexture")));
@@ -147,9 +153,22 @@ public class MainGameLoop {
 		
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 1);
+		ParticleSystem system = new ParticleSystem(particleTexture, 50, 25, 0.3f, 4, 1);
+		system.randomizeRotation();
+		system.setDirection(new Vector3f(0, 1, 0), 0.1f);
+		system.setLifeError(0.1f);
+		system.setSpeedError(0.4f);
+		system.setScaleError(0.8f);
+		
 		while(!Display.isCloseRequested()) {
 			camera.move();
 			player.move(terrain);
+			
+			system.generateParticles(player.getPosition());
+
+			ParticleMaster.update();
+			
 			renderer.processEntity(player);
 			renderer.processTerrain(terrain);
 			
@@ -157,10 +176,13 @@ public class MainGameLoop {
 				renderer.processEntity(entity);
 			}
 			renderer.render(lights, camera);
-			//guiRenderer.render(guis);
+			
+			ParticleMaster.renderParticles(camera);
+			// guiRenderer.render(guis);
 			DisplayManager.updateDisplay();
 		}
 
+		ParticleMaster.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();

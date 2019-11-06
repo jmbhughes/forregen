@@ -124,4 +124,8 @@ public class MasterRenderer {
 		projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustum_length);
 		projectionMatrix.m33 = 0;
 	}
+
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
+	}
 }
