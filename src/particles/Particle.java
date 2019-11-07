@@ -14,7 +14,7 @@ public class Particle {
 	private float scale;
 	
 	private ParticleTexture texture; 
-	
+		
 	private float elapsedTime = 0;
 
 	public Particle(ParticleTexture texture, Vector3f position, Vector3f velocity, float gravityEffect, float lifeLength, float rotation,

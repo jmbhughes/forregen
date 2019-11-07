@@ -104,7 +104,7 @@ public class MainGameLoop {
 
 		Random random = new Random();
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			if (i % 7 == 0) {
 				x = random.nextFloat() * 800;
 				z = random.nextFloat() * -600;
@@ -131,12 +131,8 @@ public class MainGameLoop {
 				y = terrain.getHeightOfTerrain(x, z)+5;
 
 				entities.add(new Entity(box, new Vector3f(x, y, z), 0, 0, 0, random.nextFloat() * 1 + 4));
-
 			}
-
 		}
-
-
 	
 		TexturedModel avatar = new TexturedModel(OBJLoader.loadObjModel("player",  loader), new ModelTexture(loader.loadTexture("playerTexture")));
 		
