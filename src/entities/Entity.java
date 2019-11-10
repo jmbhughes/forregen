@@ -12,6 +12,9 @@ public class Entity {
 	private float scale;
 	
 	private int textureIndex = 0;
+	
+	// handles whether objects are collidable, defaults to false
+	private float collisionBoxSize = 0;
 
 	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super();
@@ -103,5 +106,20 @@ public class Entity {
 	public void setScale(float scale) {
 		this.scale = scale;
 	}
+	
+	public boolean isCollidable() {
+		return collisionBoxSize != 0;
+	}
+
+	public float getCollisionBoxSize() {
+		return collisionBoxSize;
+	}
+
+	public void setCollisionBoxSize(float collisionBoxSize) {
+		this.collisionBoxSize = collisionBoxSize;
+	}
+	
+	
+
 	
 }

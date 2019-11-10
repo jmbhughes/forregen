@@ -66,16 +66,18 @@ public class ParticleSystem {
 		this.scaleError = error * averageScale;
 	}
 
-	public void generateParticles(Vector3f systemCenter) {
+	public void generateParticles(Vector3f systemCenter, boolean emitNew) {
 		float delta = DisplayManager.getFrameTimeSeconds();
 		float particlesToCreate = pps * delta;
 		int count = (int) Math.floor(particlesToCreate);
 		float partialParticle = particlesToCreate % 1;
-		for (int i = 0; i < count; i++) {
-			emitParticle(systemCenter);
-		}
-		if (Math.random() < partialParticle) {
-			emitParticle(systemCenter);
+		if (emitNew) {
+			for (int i = 0; i < count; i++) {
+				emitParticle(systemCenter);
+			}
+			if (Math.random() < partialParticle) {
+				emitParticle(systemCenter);
+			}
 		}
 	}
 

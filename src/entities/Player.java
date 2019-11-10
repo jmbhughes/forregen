@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.List;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -12,7 +14,7 @@ public class Player extends Entity {
 	private static final float RUN_SPEED = 50;   // units per second
 	private static final float TURN_SPEED = 200; // degrees per second
 	public static final float GRAVITY = -150;
-	private static final float JUMP_POWER = 130;
+	private static final float JUMP_POWER = 30;
 	
 	
 	private float currentSpeed = 0;
@@ -25,13 +27,23 @@ public class Player extends Entity {
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
 
-	public void move(Terrain terrain){
+	public boolean move(Terrain terrain, List<Entity> entities){
+		boolean canMove = true;
 		checkInputs();
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
+		
+		// Move player
 		float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
-		super.increasePosition(dx, 0, dz);
+		if (canMoveWithoutCollision(new Vector3f(dx, 0, dz), entities)) {
+			super.increasePosition(dx, 0, dz);
+			canMove = true;
+		} else {
+			canMove = false;
+		}
+		
+		// Allow for jumps
 		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
 		super.increasePosition(0, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
@@ -40,9 +52,8 @@ public class Player extends Entity {
 			super.getPosition().y = terrainHeight;
 			isAirborn = false;
 		}
-		
-		//System.out.println(getPosition().x + "," + getPosition().y + "," + getPosition().z);  
 
+		// Check the bounds
 		if (getPosition().x  < 0){
 			upwardsSpeed = 0;
 			getPosition().x = 0;
@@ -60,6 +71,7 @@ public class Player extends Entity {
 			upwardsSpeed = 0;
 			getPosition().z = -800;
 		}
+		return canMove;
 		
 	}
 	
@@ -91,6 +103,23 @@ public class Player extends Entity {
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
 			jump();
 		}
+	}
+	
+	public boolean canMoveWithoutCollision(Vector3f direction, List<Entity> entities) {
 		
+		Vector3f newPosition = new Vector3f(getPosition().x + direction.x, getPosition().y + direction.y, getPosition().z + direction.z);
+
+		for (Entity entity: entities) {
+			if (entity.isCollidable()) {
+				float xLower = entity.getPosition().x - entity.getCollisionBoxSize() / 2;
+				float xUpper = entity.getPosition().x + entity.getCollisionBoxSize() / 2;
+				float zLower = entity.getPosition().z - entity.getCollisionBoxSize() / 2;
+				float zUpper = entity.getPosition().z + entity.getCollisionBoxSize() / 2;
+				
+				if (newPosition.x > xLower && newPosition.x < xUpper && newPosition.z > zLower && newPosition.z < zUpper)
+					return false;
+			}
+		}
+		return true;
 	}
 }

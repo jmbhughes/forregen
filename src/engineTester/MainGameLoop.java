@@ -46,20 +46,18 @@ public class MainGameLoop {
 
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
 		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
-		Terrain terrain = new Terrain(0,-1,loader, texturePack, blendMap, "heightMap");
+		Terrain terrain = new Terrain(0, -1,loader, texturePack, blendMap, "heightMap");
 		// *****************************************
 		
+		// setup objects
 		TexturedModel tree = new TexturedModel(OBJLoader.loadObjModel("pine", loader), new ModelTexture(loader.loadTexture("pine")));
 		TexturedModel grass = new TexturedModel(OBJLoader.loadObjModel("grassModel", loader), new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel flower = new TexturedModel(OBJLoader.loadObjModel("grassModel", loader), new ModelTexture(loader.loadTexture("flower")));
-		TexturedModel box = new TexturedModel(OBJLoader.loadObjModel("box", loader), new ModelTexture(loader.loadTexture("box")));
-		TexturedModel bobble = new TexturedModel(OBJLoader.loadObjModel("lowPolyTree", loader), new ModelTexture(loader.loadTexture("lowPolyTree")));
 		TexturedModel lamp = new TexturedModel(OBJLoader.loadObjModel("lamp", loader), new ModelTexture(loader.loadTexture("lamp")));
 
 		ModelTexture fernTexture = new ModelTexture(loader.loadTexture("fern"));
 		fernTexture.setNumberOfRows(2);
 		TexturedModel fern = new TexturedModel(OBJLoader.loadObjModel("fern", loader), fernTexture);
-
 
 		tree.getTexture().setReflectivity(0);
 		grass.getTexture().setHasTransparency(true);
@@ -75,6 +73,8 @@ public class MainGameLoop {
 		lamp.getTexture().setReflectivity(0);
 		lamp.getTexture().setUseFakeLighting(true);
 		lamp.getTexture().setHasTransparency(true);
+		
+		// set up sun
 		List <Light> lights = new ArrayList<Light>();
 		lights.add(new Light(new Vector3f(0,1000,-7000), new Vector3f(0.4f,0.4f,0.4f))); // main sun light
 
@@ -82,13 +82,14 @@ public class MainGameLoop {
 
 		float x=0, y=0, z=0;
 
+		// add lamps
 		x = 400;
 		z = -490;
 		y = terrain.getHeightOfTerrain(x, z);
 		float yOffset = 15; // this is approximately the height of the lamp post which we add to the height of the light
 		
 		entities.add(new Entity(lamp, new Vector3f(x, y, z), 0, 0, 0, 1));
-		lights.add(new Light(new Vector3f(x, y+yOffset, z), new Vector3f(2, 0, 0), new Vector3f(1.0f, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(x, y+yOffset, z), new Vector3f(2, 2, 0), new Vector3f(1.0f, 0.01f, 0.002f)));
 
 		x = +490;
 		z = -400-60;
@@ -100,43 +101,39 @@ public class MainGameLoop {
 		z = -350;
 		y = terrain.getHeightOfTerrain(x, z);
 		entities.add(new Entity(lamp, new Vector3f(x, y, z), 0, 0, 0, 1));
-		lights.add(new Light(new Vector3f(x, y+yOffset, z), new Vector3f(0, 2, 0), new Vector3f(1.0f, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(x, y+yOffset, z), new Vector3f(2, 2, 2), new Vector3f(1.0f, 0.01f, 0.002f)));
 
+		// make lamps collidable
+		for (Entity entity: entities) {
+			entity.setCollisionBoxSize(8);
+		}
 		Random random = new Random();
-
-		for (int i = 0; i < 1000; i++) {
-			if (i % 7 == 0) {
+		
+		// add ferns and flowers
+		for (int i = 0; i < 300; i++) {
 				x = random.nextFloat() * 800;
 				z = random.nextFloat() * -600;
 				y = terrain.getHeightOfTerrain(x, z);
-
-				entities.add(new Entity(bobble, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 0.9f));
 				
 				entities.add(new Entity(fern, random.nextInt(4), new Vector3f(x-20, y, z), 0, random.nextFloat() * 360, 0, 1.5f));
-
 				entities.add(new Entity(grass, new Vector3f(x, y, z), 0, 0, 0, 1.8f));
-
 				entities.add(new Entity(flower, new Vector3f(x, y, z), 0, 0, 0, 2.3f));
-			}
-
-			if (i % 3 == 0) {
-				x = random.nextFloat() * 800;
-				z = random.nextFloat() * -600;
-				y = terrain.getHeightOfTerrain(x, z);
-				
-				entities.add(new Entity(tree, new Vector3f(x, y, z), 0, 0, 0, random.nextFloat() * 1 + 1));
-
-				x = random.nextFloat() * 800;
-				z = random.nextFloat() * -600;
-				y = terrain.getHeightOfTerrain(x, z)+5;
-
-				entities.add(new Entity(box, new Vector3f(x, y, z), 0, 0, 0, random.nextFloat() * 1 + 4));
-			}
+		}
+		
+		// add trees
+		for (int i = 0; i < 800; i++) {
+			x = random.nextFloat() * 800;
+			z = random.nextFloat() * -800;
+			y = terrain.getHeightOfTerrain(x, z);
+			Entity entity = new Entity(tree, new Vector3f(x, y, z), 0, 0, 0, random.nextFloat() * 1 + 1);
+			entity.setCollisionBoxSize(10);
+			entities.add(entity);
 		}
 	
-		TexturedModel avatar = new TexturedModel(OBJLoader.loadObjModel("player",  loader), new ModelTexture(loader.loadTexture("playerTexture")));
-		
-		Player player = new Player(avatar, new Vector3f(400,0,-400), 0,180,0,1);
+		//TexturedModel avatar = new TexturedModel(OBJLoader.loadObjModel("player",  loader), new ModelTexture(loader.loadTexture("playerTexture")));
+		TexturedModel avatar = new TexturedModel(OBJLoader.loadObjModel("stanfordBunny",  loader), new ModelTexture(loader.loadTexture("playerTexture")));
+
+		Player player = new Player(avatar, new Vector3f(400,0,-400), 0,180,0,0.5f);
 		Camera camera = new Camera(player);
 		
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
@@ -159,9 +156,9 @@ public class MainGameLoop {
 		
 		while(!Display.isCloseRequested()) {
 			camera.move();
-			player.move(terrain);
+			boolean canMove = player.move(terrain, entities);
 			
-			system.generateParticles(player.getPosition());
+			system.generateParticles(player.getPosition(), canMove);
 
 			ParticleMaster.update();
 			
