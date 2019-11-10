@@ -1,6 +1,7 @@
 package renderEngine;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -50,7 +51,7 @@ public class Loader {
 	public int loadTexture(String fileName){
 		Texture texture = null; // this Texture object is provided by slick utils and is not cross platform compatible
 		try{
-			texture = TextureLoader.getTexture("PNG", new FileInputStream("res/" + fileName + ".png"));
+			texture = TextureLoader.getTexture("PNG", Loader.class.getResourceAsStream("/res/" + fileName + ".png"));
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
@@ -84,7 +85,7 @@ public class Loader {
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texID);
 		
 		for (int i = 0; i<textureFiles.length;i++){
-			TextureData data = decodeTextureFile("res/" + textureFiles[i] + ".png");
+			TextureData data = decodeTextureFile(textureFiles[i]);
 			// notice the + i, as explained in the video.
 			GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL11.GL_RGBA, data.getWidth(), data.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffer());
 		}
@@ -102,7 +103,7 @@ public class Loader {
 		int height = 0;
 		ByteBuffer buffer = null;
 		try {
-			FileInputStream in = new FileInputStream(fileName);
+			InputStream in = Loader.class.getResourceAsStream("/res/" + fileName + ".png");
 			PNGDecoder decoder = new PNGDecoder(in);
 			width = decoder.getWidth();
 			height = decoder.getHeight();

@@ -3,6 +3,8 @@ package shaders;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -98,7 +100,8 @@ public abstract class ShaderProgram {
 		StringBuilder shaderSource = new StringBuilder();
 
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			InputStream in = ShaderProgram.class.getResourceAsStream(file);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
 			String line;
 
